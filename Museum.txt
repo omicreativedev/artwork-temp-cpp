@@ -1,0 +1,624 @@
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+
+#include "Date.h"
+#include "Painting.h"
+#include "Sculpture.h"
+#include "WrittenWord.h"
+#include "findMinMax.hpp"
+
+//++++++++++++++++++++++++++++++++++++++++
+// Name: Salome Shunamon
+// Date: May 18, 2023
+// Class: 2023SP CSC-237-01H
+// Description: Final Project 2
+//++++++++++++++++++++++++++++++++++++++++
+
+const int maxUserArtworks = 10;
+int SIZE = 0;
+
+int main() {
+  // Example Painting
+  Name name_artist("Sally", "TheArtist");
+  Date created_artist(2000, 6, 15);
+  Date acquired_artist(2022, 4, 1);
+  Name donatedBy_artist("Elizabeth", "Bunker");
+  Dimensions dimensions_artist(24.0, 36.0);
+  Painting painting_example(name_artist, created_artist, acquired_artist,
+                            donatedBy_artist, "Ego Musk", "AIArt",
+                            dimensions_artist);
+
+  // Example Sculpture
+  Name name_sculpture("Wu", "TangClan");
+  Date created_sculpture(1998, 5, 12);
+  Date acquired_sculpture(2020, 10, 3);
+  Name donatedBy_sculpture("Alice", "InChains");
+  Dimensions dimensions_sculpture(12.0, 18.0, 6.0);
+  Sculpture sculpture_example(name_sculpture, created_sculpture,
+                              acquired_sculpture, donatedBy_sculpture,
+                              "Really cool model of a sailboat", "Metal",
+                              dimensions_sculpture, 150.0);
+
+  // Example Written Word
+  Name name_writtenWord("Michael", "Jackson");
+  Date created_writtenWord(1884, 1, 1);
+  Date acquired_writtenWord(2021, 8, 17);
+  Name donatedBy_writtenWord("Dolly", "Pardon");
+  WrittenWord writtenWord_example(name_writtenWord, created_writtenWord,
+                                  acquired_writtenWord, donatedBy_writtenWord,
+                                  "A song on the top of the pop charts",
+                                  Genre::Song, 5);
+
+  // Simple Array to Demonstrate Program
+  ArtWork* artworks[3] = {&painting_example, &sculpture_example,
+                          &writtenWord_example};
+
+  // Array to store user input artworks
+  ArtWork* userArtworks[maxUserArtworks];
+
+  // Counter for the number of user input artworks
+  int numUserArtworks = 0;
+
+  // Variable to track if the user wants to add another artwork
+  bool addAnotherArtwork = true;
+
+  while (addAnotherArtwork && numUserArtworks < maxUserArtworks) {
+    // Ask the user for the artwork type
+    int artworkType;
+    std::cout << "Enter the artwork type:\n"
+              << "1. Painting\n"
+              << "2. Sculpture\n"
+              << "3. Written Word\n"
+              << "4. Exit\n"
+              << "Choice: ";
+    std::cin >> artworkType;
+
+    if (artworkType == 1) {
+      // SELECTION — PAINTING
+      std::string authorFirstName, authorLastName;
+      std::string createdStr, acquiredStr;
+      std::string description;
+      std::string donatedByFirstName, donatedByLastName;
+      std::string medium;
+      double width, height;
+
+      std::cout << "Author First name: ";
+      std::cin.ignore();
+      std::getline(std::cin, authorFirstName);
+
+      std::cout << "Author Last name: ";
+      // std::cin.ignore();
+      std::getline(std::cin, authorLastName);
+
+      bool validFormat = false;
+      while (!validFormat) {
+        std::cout << "Created date YYYY-MM-DD: ";
+        std::getline(std::cin, createdStr);
+
+        // Must be YYYY-MM-DD
+        if (createdStr.size() == 10 && createdStr[4] == '-' &&
+            createdStr[7] == '-') {
+          bool onlyDigitsAndDash = true;
+
+          // Must be # or -
+          for (char c : createdStr) {
+            if ((c < '0' || c > '9') && c != '-') {
+              onlyDigitsAndDash = false;
+              break;
+            }
+          }
+
+          if (onlyDigitsAndDash) {
+            validFormat = true;
+          } else {
+            std::cout
+                << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+                << std::endl;
+          }
+        } else {
+          std::cout
+              << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+              << std::endl;
+        }
+      }
+      Date created = stringToDate(createdStr);
+
+      validFormat = false;
+      while (!validFormat) {
+        std::cout << "Acquired date YYYY-MM-DD: ";
+        std::getline(std::cin, acquiredStr);
+
+        // Must be YYYY-MM-DD
+        if (acquiredStr.size() == 10 && acquiredStr[4] == '-' &&
+            acquiredStr[7] == '-') {
+          bool onlyDigitsAndDash = true;
+
+          // Must be # or -
+          for (char c : acquiredStr) {
+            if ((c < '0' || c > '9') && c != '-') {
+              onlyDigitsAndDash = false;
+              break;
+            }
+          }
+
+          if (onlyDigitsAndDash) {
+            validFormat = true;
+          } else {
+            std::cout
+                << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+                << std::endl;
+          }
+        } else {
+          std::cout
+              << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+              << std::endl;
+        }
+      }
+      Date acquired = stringToDate(acquiredStr);
+
+      /*
+            std::cout << "Created date YYYY-MM-DD: ";
+            std::cin.ignore();
+            std::getline(std::cin, createdStr);
+            Date created = stringToDate(createdStr);
+
+            std::cout << "Acquired date YYYY-MM-DD: ";
+            std::cin.ignore();
+            std::getline(std::cin, acquiredStr);
+            Date acquired = stringToDate(acquiredStr);
+      */
+      std::cout << "Description: ";
+      // std::cin.ignore();
+      std::getline(std::cin, description);
+
+      std::cout << "Medium: ";
+      // std::cin.ignore();
+      std::getline(std::cin, medium);
+
+      std::cout << "Donor First Name: ";
+      // std::cin.ignore();
+      std::getline(std::cin, donatedByFirstName);
+
+      std::cout << "Donor Last Name: ";
+      // std::cin.ignore();
+      std::getline(std::cin, donatedByLastName);
+
+      std::cout << "Width: ";
+      std::cin >> width;
+
+      std::cout << "Height: ";
+      std::cin >> height;
+
+      Painting* painting =
+          new Painting(Name(authorFirstName, authorLastName), created, acquired,
+                       Name(donatedByFirstName, donatedByLastName), description,
+                       medium, Dimensions(width, height));
+
+      // Add the Painting to the userArtworks array
+      userArtworks[numUserArtworks] = painting;
+      numUserArtworks++;
+
+    } else if (artworkType == 2) {
+      // SELECTION - SCULPTURE
+      std::string authorFirstName, authorLastName;
+      std::string createdStr, acquiredStr;
+      std::string description;
+      std::string donatedByFirstName, donatedByLastName;
+      std::string medium;
+      double width, height, depth, weight;
+
+      std::cout << "Author First name: ";
+      std::cin.ignore();
+      std::getline(std::cin, authorFirstName);
+
+      std::cout << "Author Last name: ";
+      // std::cin.ignore();
+      std::getline(std::cin, authorLastName);
+
+      bool validFormat = false;
+      while (!validFormat) {
+        std::cout << "Created date YYYY-MM-DD: ";
+        std::getline(std::cin, createdStr);
+
+        // Must be YYYY-MM-DD
+        if (createdStr.size() == 10 && createdStr[4] == '-' &&
+            createdStr[7] == '-') {
+          bool onlyDigitsAndDash = true;
+
+          // Must be # or -
+          for (char c : createdStr) {
+            if ((c < '0' || c > '9') && c != '-') {
+              onlyDigitsAndDash = false;
+              break;
+            }
+          }
+
+          if (onlyDigitsAndDash) {
+            validFormat = true;
+          } else {
+            std::cout
+                << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+                << std::endl;
+          }
+        } else {
+          std::cout
+              << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+              << std::endl;
+        }
+      }
+      Date created = stringToDate(createdStr);
+
+      validFormat = false;
+      while (!validFormat) {
+        std::cout << "Acquired date YYYY-MM-DD: ";
+        std::getline(std::cin, acquiredStr);
+
+        // Must be YYYY-MM-DD
+        if (acquiredStr.size() == 10 && acquiredStr[4] == '-' &&
+            acquiredStr[7] == '-') {
+          bool onlyDigitsAndDash = true;
+
+          // Must be # or -
+          for (char c : acquiredStr) {
+            if ((c < '0' || c > '9') && c != '-') {
+              onlyDigitsAndDash = false;
+              break;
+            }
+          }
+
+          if (onlyDigitsAndDash) {
+            validFormat = true;
+          } else {
+            std::cout
+                << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+                << std::endl;
+          }
+        } else {
+          std::cout
+              << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+              << std::endl;
+        }
+      }
+      Date acquired = stringToDate(acquiredStr);
+
+      /*
+            std::cout << "Created date YYYY-MM-DD: ";
+            std::cin.ignore();
+            std::getline(std::cin, createdStr);
+            Date created = stringToDate(createdStr);
+
+            std::cout << "Acquired date YYYY-MM-DD: ";
+            std::cin.ignore();
+            std::getline(std::cin, acquiredStr);
+            Date acquired = stringToDate(acquiredStr);
+      */
+
+      std::cout << "Description: ";
+      // std::cin.ignore();
+      std::getline(std::cin, description);
+
+      std::cout << "Medium: ";
+      // std::cin.ignore();
+      std::getline(std::cin, medium);
+
+      std::cout << "Donor First Name: ";
+      // std::cin.ignore();
+      std::getline(std::cin, donatedByFirstName);
+
+      std::cout << "Donor Last Name: ";
+      // std::cin.ignore();
+      std::getline(std::cin, donatedByLastName);
+
+      std::cout << "Width: ";
+      std::cin >> width;
+
+      std::cout << "Height: ";
+      std::cin >> height;
+
+      std::cout << "Depth: ";
+      std::cin >> depth;
+
+      std::cout << "Weight: ";
+      std::cin >> weight;
+
+      Sculpture* sculpture = new Sculpture(
+          Name(authorFirstName, authorLastName), created, acquired,
+          Name(donatedByFirstName, donatedByLastName), description, medium,
+          Dimensions(width, height, depth), weight);
+
+      // Add the Sculpture to the userArtworks array
+      userArtworks[numUserArtworks] = sculpture;
+      numUserArtworks++;
+
+    } else if (artworkType == 3) {
+      // SELECTION - WRITTEN WORD
+      std::string authorFirstName, authorLastName;
+      std::string createdStr, acquiredStr;
+      std::string description;
+      std::string genre;
+      std::string donatedByFirstName, donatedByLastName;
+      int numPages;
+
+      std::cout << "Author First name: ";
+      std::cin.ignore();
+      std::getline(std::cin, authorFirstName);
+
+      std::cout << "Author Last name: ";
+      // std::cin.ignore();
+      std::getline(std::cin, authorLastName);
+
+      bool validFormat = false;
+      while (!validFormat) {
+        std::cout << "Created date YYYY-MM-DD: ";
+        std::getline(std::cin, createdStr);
+
+        // Must be YYYY-MM-DD
+        if (createdStr.size() == 10 && createdStr[4] == '-' &&
+            createdStr[7] == '-') {
+          bool onlyDigitsAndDash = true;
+
+          // Must be # or -
+          for (char c : createdStr) {
+            if ((c < '0' || c > '9') && c != '-') {
+              onlyDigitsAndDash = false;
+              break;
+            }
+          }
+
+          if (onlyDigitsAndDash) {
+            validFormat = true;
+          } else {
+            std::cout
+                << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+                << std::endl;
+          }
+        } else {
+          std::cout
+              << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+              << std::endl;
+        }
+      }
+      Date created = stringToDate(createdStr);
+
+      validFormat = false;
+      while (!validFormat) {
+        std::cout << "Acquired date YYYY-MM-DD: ";
+        std::getline(std::cin, acquiredStr);
+
+        // Must be YYYY-MM-DD
+        if (acquiredStr.size() == 10 && acquiredStr[4] == '-' &&
+            acquiredStr[7] == '-') {
+          bool onlyDigitsAndDash = true;
+
+          // Must be # or -
+          for (char c : acquiredStr) {
+            if ((c < '0' || c > '9') && c != '-') {
+              onlyDigitsAndDash = false;
+              break;
+            }
+          }
+
+          if (onlyDigitsAndDash) {
+            validFormat = true;
+          } else {
+            std::cout
+                << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+                << std::endl;
+          }
+        } else {
+          std::cout
+              << "\t !!! Date must be YYYY-MM-DD. Only numbers and dashes."
+              << std::endl;
+        }
+      }
+      Date acquired = stringToDate(acquiredStr);
+
+      /*
+            std::cout << "Created date YYYY-MM-DD: ";
+            std::cin.ignore();
+            std::getline(std::cin, createdStr);
+            Date created = stringToDate(createdStr);
+
+            std::cout << "Acquired date YYYY-MM-DD: ";
+            std::cin.ignore();
+            std::getline(std::cin, acquiredStr);
+            Date acquired = stringToDate(acquiredStr);
+      */
+
+      std::cout << "Description: ";
+      // std::cin.ignore();
+      std::getline(std::cin, description);
+
+      std::cout << "Enter the Genre: ";
+      // std::cin.ignore();
+      std::getline(std::cin, genre);
+
+      std::cout << "Donor First Name: ";
+      // std::cin.ignore();
+      std::getline(std::cin, donatedByFirstName);
+
+      std::cout << "Donor Last Name: ";
+      // std::cin.ignore();
+      std::getline(std::cin, donatedByLastName);
+
+      std::cout << "Number of Pages: ";
+      std::cin >> numPages;
+
+      WrittenWord* writtenWord =
+          new WrittenWord(Name(authorFirstName, authorLastName), created,
+                          acquired, Name(donatedByFirstName, donatedByLastName),
+                          description, GenreUtils::FromString(genre), numPages);
+
+      // Add the Written Word to the userArtworks array
+      userArtworks[numUserArtworks] = writtenWord;
+      numUserArtworks++;
+
+    } else if (artworkType == 4) {
+      std::cout << "\t\t ~~~~~ Goodbye ~~~~~" << std::endl;
+      break;
+
+    }
+
+    else {
+      std::cout << "\nWe only accept Paintings, Sculptures, and Written Word."
+                << std::endl;
+    }
+
+    // Ask the user if they want to add another artwork
+    char choice;
+    std::cout << "\nDo you have another artwork to add? (Y/N) ";
+    std::cin >> choice;
+
+    // Clear input stream
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    if (choice != 'Y' && choice != 'y') {
+      addAnotherArtwork = false;
+    }
+  }
+
+  // Calculate total number of objects
+  int totalObjects = Painting::getNumberOfPaintings() +
+                     Sculpture::getNumberOfSculptures() +
+                     WrittenWord::getNumberOfWrittenWordItems();
+
+  // Why won't it let me do this :(
+  SIZE = numUserArtworks + 3;
+  ArtWork* totalArray[SIZE];
+
+  for (int i = 0; i < 3; i++) {
+    totalArray[i] = artworks[i];
+  }
+  for (int i = 0; i < numUserArtworks; i++) {
+    totalArray[i + 3] = userArtworks[i];
+  }
+
+  // Print the total number of each type of artwork to the console
+  std::cout << "TOTAL NUMBER OF ARTWORKS" << std::endl;
+  std::cout << "------------------------" << std::endl;
+  std::cout << "\nNumber of Paintings: " << Painting::getNumberOfPaintings()
+            << std::endl;
+  std::cout << "Number of Sculptures: " << Sculpture::getNumberOfSculptures()
+            << std::endl;
+  std::cout << "Number of Written Words: "
+            << WrittenWord::getNumberOfWrittenWordItems() << std::endl;
+  std::cout << "Total Number of Items in Library: " << totalObjects
+            << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "LIST OF ALL ARTWORKS" << std::endl;
+  std::cout << "--------------------" << std::endl;
+  // Print information about each USER artwork to the console
+  if (numUserArtworks > 0) {
+    std::cout << "---------- User Artwork" << std::endl;
+  }
+  for (int i = 0; i < numUserArtworks; i++) {
+    const ArtWork* artwork = userArtworks[i];
+    std::cout << artwork->toString();
+    std::cout << "Value: $" << std::fixed << std::setprecision(2)
+              << artwork->value() << std::endl;
+    std::cout << std::endl;
+  }
+
+  // Print information about each Example artwork to the console
+  std::cout << "---------- Example Artwork" << std::endl;
+  for (int i = 0; i < 3; i++) {
+    const ArtWork* artwork = artworks[i];
+    std::cout << artwork->toString();  // problem
+    std::cout << "Value: $" << std::fixed << std::setprecision(2)
+              << artwork->value() << std::endl;
+    std::cout << std::endl;
+  }
+
+  std::cout << "LIST OF ALL ARTWORKS" << std::endl;
+  std::cout << "--------------------" << std::endl;
+  for (int i = 0; i < totalObjects; i++) {
+    const ArtWork* artwork = totalArray[i];
+    std::cout << artwork->toString();
+    std::cout << "Value: $" << std::fixed << std::setprecision(2)
+              << artwork->value() << std::endl;
+    std::cout << std::endl;
+  }
+
+  // MINIMUM AND MAXIMUM VALUES
+  const ArtWork* minArtwork = findMinimumValue(userArtworks, numUserArtworks);
+  const ArtWork* maxArtwork = findMaximumValue(userArtworks, numUserArtworks);
+
+  // Print Min and Max to the console
+  std::cout << "MINIMUM AND MAXIMUM VALUE" << std::endl;
+  std::cout << "-------------------------" << std::endl;
+  std::cout << "Minimum Value:" << std::endl;
+  std::cout << minArtwork->toString();
+  std::cout << "Value: $" << std::fixed << std::setprecision(2)
+            << minArtwork->value() << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "Maximum Value:" << std::endl;
+  std::cout << maxArtwork->toString();
+  std::cout << "Value: $" << std::fixed << std::setprecision(2)
+            << maxArtwork->value() << std::endl;
+  std::cout << std::endl;
+
+  // Print information about each artwork to a file
+  std::ofstream outFile("artwork_library.txt");
+  if (outFile.is_open()) {
+    for (int i = 0; i < totalObjects; i++) {
+      const ArtWork* artwork = totalArray[i];
+      outFile << artwork->toString();
+      outFile << "Value: $" << std::fixed << std::setprecision(2)
+              << artwork->value() << std::endl;
+      outFile << std::endl;
+    }
+    outFile.close();
+    std::cout << "Artwork Library File Updated" << std::endl;
+  } else {
+    std::cout << "Cannot Write to the Artwork Library." << std::endl;
+  }
+
+  // Open the file for writing
+  std::ofstream outFile1("artwork_value_report.txt");
+  if (outFile1.is_open()) {
+    // Print the total number of artworks in the library
+    outFile1 << "TOTAL NUMBER OF ARTWORK IN LIBRARY" << std::endl;
+    outFile1 << "----------------------------------" << std::endl;
+    outFile1 << "Number of Paintings: " << Painting::getNumberOfPaintings()
+             << std::endl;
+    outFile1 << "Number of Sculptures: " << Sculpture::getNumberOfSculptures()
+             << std::endl;
+    outFile1 << "Number of Written Words: "
+             << WrittenWord::getNumberOfWrittenWordItems() << std::endl;
+    outFile1 << "Total Number of Items in Library: " << totalObjects
+             << std::endl
+             << std::endl;
+
+    // Print the minimum and maximum values to the file
+    outFile1 << "MINIMUM AND MAXIMUM VALUE ARTWORK IN LIBRARY" << std::endl;
+    outFile1 << "--------------------------------------------" << std::endl;
+    outFile1 << "Minimum Value:" << std::endl;
+    outFile1 << minArtwork->toString();
+    outFile1 << "Value: $" << std::fixed << std::setprecision(2)
+             << minArtwork->value() << std::endl;
+    outFile1 << std::endl;
+
+    outFile1 << "Maximum Value:" << std::endl;
+    outFile1 << maxArtwork->toString();
+    outFile1 << "Value: $" << std::fixed << std::setprecision(2)
+             << maxArtwork->value() << std::endl;
+    outFile1 << std::endl;
+
+    // Close the report file
+    outFile1.close();
+    std::cout << "Artwork Report Generated." << std::endl;
+  } else {
+    std::cout << "Cannot write to the Artwork Report." << std::endl;
+  }
+
+  // Delete dynamically allocated objects
+  for (int i = 0; i < numUserArtworks; i++) {
+    delete userArtworks[i];
+  }
+
+  return 0;
+}
